@@ -8,13 +8,17 @@ function preload() {
   sprite_perso_esq = loadAnimation('img/perso/esquerda/perso_1.png', 'img/perso/esquerda/perso_2.png');
   sprite_perso_tes = loadAnimation('img/perso/tesouro/tesouro_1.png', 'img/perso/tesouro/tesouro_3.png');
   sprite_perso_cor = loadAnimation('img/perso/corda/perso_1.png', 'img/perso/corda/perso_2.png');
-  sprite_pego = loadAnimation('img/perso/pego/pego.png', 'img/perso/pego/pego_2.png');
+  sprite_perso_cor2 = loadAnimation('img/perso/cordaEnd/perso_1.png', 'img/perso/cordaEnd/perso_3.png');
+  sprite_pego = loadAnimation('img/perso/pego/pego_1.png', 'img/perso/pego/pego_2.png');
+  sprite_barco = loadImage('img/perso/vida/perso_1.png');
 
   polvo_ten_1 = loadAnimation('img/polvo/tentaculoA/tentaculo_1.png', 'img/polvo/tentaculoA/tentaculo_6.png');
   polvo_ten_2 = loadAnimation('img/polvo/tentaculoB/tentaculo_1.png', 'img/polvo/tentaculoB/tentaculo_5.png');
   polvo_ten_3 = loadAnimation('img/polvo/tentaculoC/tentaculo_1.png', 'img/polvo/tentaculoC/tentaculo_4.png');
   polvo_ten_4 = loadAnimation('img/polvo/tentaculoD/tentaculo_1.png', 'img/polvo/tentaculoD/tentaculo_5.png');
   polvo_ten_5 = loadAnimation('img/polvo/tentaculoE/tentaculo_1.png', 'img/polvo/tentaculoE/tentaculo_5.png');
+  polvo_carinha = loadAnimation('img/polvo/carinha/cara_1.png', 'img/polvo/carinha/cara_6.png');
+  fontP2 = loadFont('font/FontP2.ttf');
 
 }
 
@@ -22,7 +26,7 @@ function setup(){
 	createCanvas(240,160);
   frameRate(24);
   obj_Deus = new Deus(24);
-  alert("Pressione Seta Esquerda e Direita para jogar ");
+  alert("Pressione Seta Esquerda e Direita para jogar");
 }
 
 function draw(){
@@ -51,7 +55,7 @@ class Deus {
     this.pego = false;
     this.bg = bg;
     this.bg2 = bg2;
-    // this.sprBarco = sprite_barco;
+    this.sprBarco = sprite_barco;
     this.sprPego = sprite_pego;
     this.personagem = new Personagem();
     this.octopus = new Octopus();
@@ -63,17 +67,18 @@ class Deus {
 
   engine(){
     this.carregarBG();
-    // this.carregarBarquinho();
+    this.carregarBarquinho();
     this.contadorFrame();
     this.mostrarPontuacao();
     // this.contadorFrame();
     this.octopus.carregarTentaculos();
+    this.octopus.animacaoCarinha();
     if(this.iniciado){
       this.personagem.posicionarPersonagem();
-      // this.verificarDerrota();
+      this.verificarDerrota();
     }
     if(this.pego){
-      // this.mostrarPego();
+      this.mostrarPego();
     }
   }
 
@@ -87,21 +92,27 @@ class Deus {
   }
 
   mostrarPontuacao(){
-    textSize(20);
-    text(this.pontuacao, 120, 20);
+    textSize(13);
+    textFont(fontP2);
+    fill(232, 248, 0);
+    stroke(0, 0, 0);
+    strokeWeight(3);
+    text(this.pontuacao, 110, 17);
   }
 
   carregarBarquinho(){
-    if(!this.iniciado){
-      // image(this.sprBarco.getImageAt(0), 20, 4);
-      animation(this.sprBarco, 35, 15);
+    
+    if(this.vidas == 1){
+      image(this.sprBarco, 150, 1);
     }
     if(this.vidas == 2){
-      image(barco_parado, 50, 4);
+      image(this.sprBarco, 153, 1);
+      image(this.sprBarco, 170, 1);
     }
     if(this.vidas == 3){
-      image(barco_parado, 53, 4);
-      image(barco_parado, 70, 4);
+      image(this.sprBarco, 153, 1);
+      image(this.sprBarco, 170, 1);
+      image(this.sprBarco, 187, 1);
     }
     
   }
@@ -148,29 +159,37 @@ class Deus {
   }
 
   verificarDerrota(){
-    const posicao = this.personagem.posicaoAtual;
+    
+    const posicao = this.personagem.angulo;
     const inicio1 =  this.octopus.inicio1;
     const inicio2 =  this.octopus.inicio2;
     const inicio3 =  this.octopus.inicio3;
     const inicio4 =  this.octopus.inicio4;
+    const inicio5 =  this.octopus.inicio5;
+    // console.log(posicao);
+    // console.log(inicio1, inicio2, inicio3, inicio5, inicio5);
 
-    if((posicao == 0 || posicao == 1) && inicio1 == 3){
+    if((posicao > 3.34 && posicao < 3.60) && inicio1 == 5){
       this.retirarVida();
       return true;
     }
-    if((posicao == 4 || posicao == 5) && inicio2 == 4){
+    if((posicao > 2.74 && posicao < 3.00) && inicio2 == 4){
       this.retirarVida();
       return true;
     }
-    if((posicao == 6 || posicao == 7) && inicio3 == 4){
+    if((posicao > 2.34 && posicao < 2.60) && inicio4 == 4){
       this.retirarVida();
       return true;
     }
-    if(posicao > 7 && inicio4 == 3){
+    if((posicao > 1.74 && posicao < 2.00) && inicio3 >= 3){
       this.retirarVida();
       return true;
     }
-
+    if((posicao < 0.80) && inicio5 == 4){
+      this.retirarVida();
+      return true;
+    }
+    
     // console.log(posicao, inicio4);
   }
 
@@ -179,13 +198,12 @@ class Deus {
     this.pego = true;
     this.frameContador = this.frameAtual;
     this.framePegoFim = this.frameAtual + 3 * this.frames;
-    // console.log(this.framePegoFim);
+    // console.log(this.vidas);
 
     if(this.vidas > 0){
       this.resetarObjetos();
       // console.log(this.vidas);
     }else{
-      
       alert("Game Over!! Sua pontuação total foi de: " + this.pontuacao + " pontos");
       // console.log(this.pontuacao);
       this.resetarObjetos();
@@ -212,6 +230,7 @@ class Personagem {
     this.sprite_esq = sprite_perso_esq;
     this.sprite_dir = sprite_perso;
     this.sprite_cor = sprite_perso_cor;
+    this.sprite_cor2 = sprite_perso_cor2;
     this.sprite_tes = sprite_perso_tes;
     this.tesouro = sprite_perso;
     this.corda = sprite_perso;
@@ -255,6 +274,9 @@ class Personagem {
     if(this.angulo > 2.95){
       this.sprite = this.sprite_cor;
     }
+    if(this.angulo > 2.94 && this.angulo <  2.95){
+      this.sprite = this.sprite_cor2;
+    }
     if(this.angulo < 0.94){
       this.sprite = this.sprite_tes;
     }
@@ -289,13 +311,14 @@ class Personagem {
 
 class Octopus {
 	constructor(){
-    // this.pego = sprite_pego;
+    this.pego = sprite_pego;
     // this.base = base_polvo;
     this.sprTentaculo1 = polvo_ten_1;
     this.sprTentaculo2 = polvo_ten_2;
     this.sprTentaculo3 = polvo_ten_3;
     this.sprTentaculo4 = polvo_ten_4;
     this.sprTentaculo5 = polvo_ten_5;
+    this.spriteCarinha = polvo_carinha;
     this.inicio1 = int(random(1, 2));
     this.inicio2 = int(random(1, 4));
     this.inicio3 = int(random(1, 4));
@@ -306,8 +329,8 @@ class Octopus {
     this.variacao3 = 1;
     this.variacao4 = 1;
     this.variacao5 = 1;
-    this.tentaculo1 = createVector(43,27);
-    this.tentaculo2 = createVector(7,36);
+    this.tentaculo1 = createVector(20,27);
+    this.tentaculo2 = createVector(7,55);
     this.tentaculo3 = createVector(81,91);
     this.tentaculo4 = createVector(43,70);
     this.tentaculo5 = createVector(172,82);
@@ -343,8 +366,12 @@ class Octopus {
     this.inicio3 = this.inicio3 + this.variacao3;
     this.inicio4 = this.inicio4 + this.variacao4;
     this.inicio5 = this.inicio5 + this.variacao5;
-    console.log(this.inicio1, this.inicio2, this.inicio3, this.inicio4, this.inicio5);
+    // console.log(this.inicio1, this.inicio2, this.inicio3, this.inicio4, this.inicio5);
 
+  }
+
+  animacaoCarinha(){
+    animation(this.spriteCarinha, 178, 63);
   }
 
   carregarTentaculos(){
